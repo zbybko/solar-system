@@ -33,6 +33,10 @@
 // Function specifiers in case library is build/used as a shared library
 // NOTE: Microsoft specifiers to tell compiler that symbols are imported/exported from a .dll
 // NOTE: visibility("default") attribute makes symbols "visible" when compiled with -fvisibility=hidden
+// RLIMGUI_STATIC: вендорная статическая сборка. Без него на Windows макрос
+// USE_LIBTYPE_SHARED (его задаёт raylib-DLL) сделал бы функции dllimport и
+// статическая линковка падала бы с unresolved __imp_*.
+#if !defined(RLIMGUI_STATIC)
 #if defined(_WIN32)
 #if defined(__TINYC__)
 #define __declspec(x) __attribute__((x))
@@ -45,6 +49,7 @@
 #else
 #if defined(BUILD_LIBTYPE_SHARED)
 #define RLIMGUIAPI __attribute__((visibility("default"))) // We are building as a Unix shared library (.so/.dylib)
+#endif
 #endif
 #endif
 

@@ -48,7 +48,7 @@ endif()
 # NO_FONT_AWESOME, чтобы не тащить встроенные иконки FontAwesome.
 add_library(rlImGui STATIC third_party/rlImGui/rlImGui.cpp)
 target_include_directories(rlImGui PUBLIC ${CMAKE_SOURCE_DIR}/third_party/rlImGui)
-target_compile_definitions(rlImGui PUBLIC NO_FONT_AWESOME)
+target_compile_definitions(rlImGui PUBLIC NO_FONT_AWESOME RLIMGUI_STATIC)
 target_link_libraries(rlImGui PUBLIC raylib imgui::imgui)
 
 # --- Цель ----------------------------------------------------------------
@@ -102,6 +102,9 @@ endif()
 # --- Предупреждения ------------------------------------------------------
 if(MSVC)
     target_compile_options(solar-system PRIVATE /W4)
+    # std::getenv и т.п. помечены в MSVC как «небезопасные» (C4996) — глушим,
+    # код переносимый и стандартный.
+    target_compile_definitions(solar-system PRIVATE _CRT_SECURE_NO_WARNINGS)
 else()
     target_compile_options(solar-system PRIVATE -Wall -Wextra)
 endif()
