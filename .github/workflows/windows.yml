@@ -1,7 +1,9 @@
 name: build-windows
 
-# Собирает Windows-версию на настоящей Windows-машине GitHub и публикует
-# готовый архив (solar-system.exe + DLL + assets) как артефакт сборки.
+# Собирает Windows-версии (x64 и ARM64) на настоящей Windows-машине GitHub и
+# публикует готовые архивы (exe + DLL + assets) как артефакты сборки.
+# ARM64-версия нужна для Windows-on-ARM (например, Parallels на Apple Silicon) —
+# работает нативно, без эмуляции x64, что важно для OpenGL.
 # Запускается при пуше и вручную (вкладка Actions → Run workflow).
 
 on:
@@ -12,29 +14,42 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            msvc: amd64
+            triplet: x64-windows
+          - arch: arm64
+            msvc: amd64_arm64
+            triplet: arm64-windows
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Настраивает окружение компилятора MSVC (cl.exe, путь к Ninja и т.д.).
+      # Настраивает окружение компилятора MSVC под нужную архитектуру
+      # (amd64_arm64 — кросс-компиляция в ARM64 с x64-хоста).
       - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.msvc }}
 
-      # vcpkg в manifest-режиме сам подтянет raylib и imgui. libnova на
-      # Windows не нужна — используется встроенный KeplerEphemeris.
+      # vcpkg в manifest-режиме сам подтянет raylib и imgui под нужный триплет.
+      # libnova на Windows не нужна — используется встроенный KeplerEphemeris.
       - name: Configure
         shell: pwsh
         run: >
           cmake -S . -B build -G Ninja
           -DCMAKE_BUILD_TYPE=Release
+          -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }}
           -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
 
       - name: Build
         run: cmake --build build
 
-      # Собираем самодостаточный пакет: exe, его DLL (vcpkg копирует их рядом
-      # автоматически) и папку assets.
+      # Самодостаточный пакет: exe, его DLL (vcpkg копирует их рядом) и assets.
       - name: Stage package
         shell: pwsh
         run: |
@@ -45,5 +60,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: solar-system-windows
+          name: solar-system-windows-${{ matrix.arch }}
           path: dist
