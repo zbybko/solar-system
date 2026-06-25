@@ -1,0 +1,17 @@
+# Сборка
+/build/
+/out/
+
+# vcpkg
+vcpkg_installed/
+
+# IDE / ОС
+.vs/
+.vscode/
+.idea/
+.DS_Store
+*.user
+
+# Отладочные скриншоты
+*_shot.png
+imgui.ini

@@ -1,0 +1,49 @@
+name: build-windows
+
+# Собирает Windows-версию на настоящей Windows-машине GitHub и публикует
+# готовый архив (solar-system.exe + DLL + assets) как артефакт сборки.
+# Запускается при пуше и вручную (вкладка Actions → Run workflow).
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Настраивает окружение компилятора MSVC (cl.exe, путь к Ninja и т.д.).
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      # vcpkg в manifest-режиме сам подтянет raylib и imgui. libnova на
+      # Windows не нужна — используется встроенный KeplerEphemeris.
+      - name: Configure
+        shell: pwsh
+        run: >
+          cmake -S . -B build -G Ninja
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+      - name: Build
+        run: cmake --build build
+
+      # Собираем самодостаточный пакет: exe, его DLL (vcpkg копирует их рядом
+      # автоматически) и папку assets.
+      - name: Stage package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Copy-Item build/bin/* dist/ -Recurse -Force
+          Copy-Item assets dist/assets -Recurse -Force
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: solar-system-windows
+          path: dist
