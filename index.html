@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>Solar System — объектная 3D-модель</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      background: #04040a; overflow: hidden;
+      font-family: -apple-system, Segoe UI, sans-serif;
+    }
+    /* Canvas в левом-верхнем углу (0,0): raylib на вебе считает координаты
+       мыши от этого угла, поэтому смещать/центрировать canvas нельзя —
+       иначе клики по кнопкам попадают мимо. */
+    #canvas {
+      position: absolute; top: 0; left: 0;
+      display: block; background: #04040a; outline: none;
+    }
+    #loading {
+      position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      color: #9aa; font-size: 18px; letter-spacing: .5px;
+    }
+  </style>
+</head>
+<body>
+  <div id="loading">Загрузка модели Солнечной системы…</div>
+  <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+  <script>
+    var Module = {
+      canvas: (function () { return document.getElementById('canvas'); })(),
+      onRuntimeInitialized: function () {
+        var l = document.getElementById('loading');
+        if (l) l.style.display = 'none';
+      },
+      print: function (t) { console.log(t); },
+      printErr: function (t) { console.error(t); }
+    };
+  </script>
+  <script async type="text/javascript" src="solar-system.js"></script>
+</body>
+</html>
