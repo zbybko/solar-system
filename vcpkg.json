@@ -1,7 +1,7 @@
 {
   "name": "solar-system",
   "version": "0.1.0",
-  "description": "Объектная 3D-модель Солнечной системы (курсовая по ООП)",
+  "description": "Interactive C++17 solar system visualization with English, German and Russian UI",
   "dependencies": [
     "raylib",
     "imgui"

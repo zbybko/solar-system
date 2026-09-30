@@ -46,7 +46,9 @@ int main() {
     constexpr int screenWidth = 1280;
     constexpr int screenHeight = 720;
 
-    InitWindow(screenWidth, screenHeight, "Solar System — фаза 8 (UI)");
+    const char* languageEnv = std::getenv("SS_LANGUAGE");
+    const auto language = solar::languageFromCode(languageEnv ? languageEnv : "en");
+    InitWindow(screenWidth, screenHeight, solar::text(solar::Text::AppTitle, language));
     SetTargetFPS(60);
 
     // ImGui с кириллическим шрифтом (см. фазу 5).
@@ -74,7 +76,7 @@ int main() {
     renderer.applyLighting(system);
 
     solar::CameraController controller;
-    solar::UIManager ui;
+    solar::UIManager ui{language};
     solar::CelestialBody* selected = nullptr;
     int activeProvider = 0;
 

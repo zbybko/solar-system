@@ -1,122 +1,102 @@
-# Solar System — объектная 3D-модель Солнечной системы
+# Solar System
 
-Курсовая работа по ООП (C++17). Интерактивная 3D-модель Солнечной системы
-с реальными позициями планет, текстурами, управляемой камерой и панелью
-информации. Тяжёлая астрономическая математика берётся из готовых библиотек,
-но скрыта за собственными интерфейсами — иерархия классов остаётся авторской.
+An interactive 3D solar system visualization built with **C++17**, **raylib** and **Dear ImGui**.
+Explore planetary motion, switch orbital models, and inspect celestial bodies in English, German or Russian.
 
-> **Платформы.** Проект кроссплатформенный (Windows, Linux, macOS).
-> ⚠️ На **macOS 26 «Tahoe»** есть известная проблема стороннего стека: GLFW
-> (через который raylib создаёт окно) не выводит OpenGL-кадр на экран — окно
-> остаётся прозрачным. Это баг связки GLFW↔Tahoe, не кода проекта (рендер
-> в буфер корректен). Запускать на Windows, Linux или macOS ≤ 15 (Sequoia).
+[Deutsch](README.de.md)
 
-## Текущее состояние
+![Solar System running in English: Saturn, orbital controls and body information](docs/preview-en.png)
 
-**Фаза 1 — скелет (готово).** Окно 1280×720 на raylib, ESC закрывает.
-Зависимости через vcpkg (manifest mode), сборка одной командой.
+*Actual application capture using the built-in Kepler provider and colored model surfaces.*
 
-**Фаза 2 — rlImGui (готово).** Dear ImGui подключён через мост rlImGui и
-рисуется поверх 3D-сцены.
+## Overview
 
-**Фаза 3 — Vec3 + эфемериды (готово).** Математический `Vec3` с перегрузкой
-операторов; абстрактный интерфейс `IEphemeris` и его реализация
-`LibnovaEphemeris` (обёртка над libnova). Провайдер создаётся через
-`unique_ptr<IEphemeris>` и используется полиморфно (паттерн «Стратегия»).
+Originally built as a university object-oriented programming project, Solar System brings together
+numerical calculations, real-time graphics and a modular C++ architecture.
+It is an educational visualization, not a mission-planning or high-precision astronomy tool.
 
-**Фаза 4 — иерархия тел (готово).** Абстрактный `CelestialBody` и наследники
-`Star`/`Planet`/`Moon`: текстурируемые сферы (fallback на цветную), осевой
-наклон, суточное вращение, RAII-владение моделью, полиморфные `update`/`draw`.
+## Features
 
-**Фаза 5 — сборка системы (готово).** Фабрика `SolarSystem::createRealistic`
-собирает Солнце, все 8 планет, Луну и кольца Сатурна; `SimulationClock` ведёт
-юлианскую дату с множителем скорости и паузой; UI на кириллице (DejaVu Sans).
+- Sun, eight planets, Earth's Moon and Saturn's rings.
+- Orbit and free-flight cameras, mouse selection and body tracking.
+- Simulation pause, adjustable time speed, orbit paths and a reference grid.
+- Compact and real-distance views; body sizes remain exaggerated for readability.
+- Sun lighting, a starfield and an information panel with coordinates and rotation parameters.
+- Live **English / Deutsch / Русский** switching in the control panel.
+- Two interchangeable ephemeris providers: built-in Kepler/JPL calculations and optional libnova.
 
-**Фаза 6 — камера (готово).** `CameraController` с двумя режимами: орбитальный
-облёт цели и свободный полёт. Тело выбирается кликом (`SolarSystem::pickBody`),
-камера фокусируется на нём и следует за ним; выбранное тело подсвечивается.
+## Engineering
 
-**Фаза 7 — рендер-полировка (готово).** Линии орбит, звёздный фон (`Starfield`),
-освещение от Солнца (GLSL-шейдер, `Renderer` с RAII, терминатор день/ночь),
-переключатель масштаба (компактный ↔ реальный) через `RenderContext::toWorld`.
+- **Ownership:** celestial bodies and the ephemeris provider use `std::unique_ptr`; graphics resources are released through RAII.
+- **Strategy:** `IEphemeris` decouples position calculations from the scene and allows runtime provider switching.
+- **Separation of concerns:** simulation clock, camera, renderer, scene and UI have separate components.
+- **Numerics:** the Kepler provider solves Kepler's equation using Newton iteration and transforms orbital coordinates into heliocentric coordinates.
+- **Localization:** one typed translation catalog, stable ImGui widget IDs, and a dependency-free completeness test.
+- **Build:** CMake, Ninja and a pinned vcpkg dependency baseline.
 
-**Фаза 8 — UI и вторая стратегия (готово).** Весь интерфейс вынесен в
-`UIManager`: панели времени/камеры/вида и инфопанель выбранного тела. Добавлен
-второй провайдер `KeplerEphemeris` (кеплеровы элементы JPL, без библиотек);
-переключение **libnova ↔ Kepler** прямо из панели наглядно демонстрирует паттерн
-«Стратегия» (`SolarSystem::setEphemeris` подменяет стратегию, тела остаются).
+## Build and run
 
-Дальше — финал: подписи тел (3D→2D), doc-комментарии, итоговый README.
+Requirements: a C++17 compiler, CMake 3.21+, Ninja, Git and [vcpkg](https://github.com/microsoft/vcpkg).
+Bootstrap vcpkg following its instructions, then set `VCPKG_ROOT` to its checkout.
 
-## Сборка
+macOS / Linux:
 
-Требуется: CMake ≥ 3.21, компилятор C++17, Ninja, vcpkg. `raylib` и `imgui`
-ставит vcpkg автоматически. `libnova` **необязательна** (см. ниже).
+```sh
+export VCPKG_ROOT=/path/to/vcpkg
+cmake --preset default
+cmake --build --preset default
+./build/bin/solar-system
+```
 
-### Windows (рекомендуется для запуска)
-
-Нужны: [Visual Studio 2022](https://visualstudio.microsoft.com/) с компонентом
-«Разработка на C++» (даёт MSVC, CMake и Ninja) и [vcpkg](https://github.com/microsoft/vcpkg).
+Windows (PowerShell with the Visual Studio C++ build tools available):
 
 ```powershell
-# один раз: клонировать и забутстрапить vcpkg, задать переменную
-git clone https://github.com/microsoft/vcpkg C:\vcpkg
-C:\vcpkg\bootstrap-vcpkg.bat
-setx VCPKG_ROOT C:\vcpkg        # перезапустить терминал после setx
-
-# в папке проекта (из «Developer PowerShell for VS 2022»):
+$env:VCPKG_ROOT = "C:\vcpkg"
 cmake --preset default
-cmake --build build
+cmake --build --preset default
+.\build\bin\solar-system.exe
 ```
 
-Запуск: `build\bin\solar-system.exe`. libnova на Windows не нужна — используется
-встроенный провайдер `KeplerEphemeris`.
+vcpkg supplies raylib and Dear ImGui. The rlImGui bridge is included in `third_party/`.
+libnova is optional: CMake detects a system installation; without it the built-in Kepler provider is used.
 
-### macOS / Linux
+## Languages and controls
 
-```bash
-export VCPKG_ROOT=/путь/к/vcpkg
-# опционально (включает второй провайдер libnova):
-#   macOS:        brew install libnova
-#   Debian/Ubuntu: sudo apt install libnova-dev
+English is the default. Use **Language** in the control panel to switch without restarting.
+The selection lasts for the current session. Set `SS_LANGUAGE=en`, `de` or `ru` to choose a startup language.
 
-cmake --preset default
-cmake --build build
+| Input | Action |
+| --- | --- |
+| Left click | Select a body and focus the camera |
+| Right drag | Rotate the camera |
+| Mouse wheel | Zoom or adjust flight speed |
+| F | Toggle orbit / free-flight mode |
+| WASD + Q/E | Move in free-flight mode |
+| Shift | Faster flight |
+| Escape | Exit |
+
+## Checks
+
+Run the translation checks without graphics dependencies:
+
+```sh
+cmake -S . -B out/tests -DSOLAR_BUILD_APP=OFF -DBUILD_TESTING=ON
+cmake --build out/tests
+ctest --test-dir out/tests --output-on-failure
 ```
 
-Запуск: `./build/bin/solar-system`. На macOS `cmake`/`ninja` ставятся через
-Homebrew (`brew install cmake ninja`), vcpkg клонируется с GitHub и бутстрапится
-(`./bootstrap-vcpkg.sh`).
+The test verifies nonempty translations in all three languages, stable widget IDs and language fallback.
+CI runs these checks; it does not replace graphical or numerical validation.
 
-## Зависимости
+## Limitations
 
-| Библиотека | Назначение                              | Источник |
-|------------|-----------------------------------------|----------|
-| raylib 6.x | окно, 3D-рендер, glTF/текстуры, ввод     | vcpkg    |
-| Dear ImGui | UI-панели                               | vcpkg    |
-| rlImGui    | мост Dear ImGui ↔ raylib                | вендорится в `third_party/` (в vcpkg отсутствует) |
-| libnova    | координаты планет (опц., 2-й провайдер)  | системный пакет (`brew`/`apt`); на Windows не нужна |
+- The built-in Moon model uses a simplified circular orbit. Planet positions are approximations.
+- Compact mode, model radii and the Moon's displayed distance are intentionally exaggerated.
+- The repository currently uses colored body surfaces; optional texture loading exists, but planet textures are not bundled.
+- An earlier version reported a transparent-window issue with GLFW/OpenGL on macOS 26. Window presentation can depend on the OS and graphics stack.
+- No ROS integration, robot control or N-body gravitational solver is implemented.
 
-> **Замечание по libnova.** В реестре vcpkg её нет. Она **необязательна**:
-> CMake ищет её через `find_library`/`find_path`; если находит — включается
-> провайдер `LibnovaEphemeris` и появляется переключатель libnova↔Kepler в UI.
-> Если нет (например, на Windows) — проект собирается на собственном
-> `KeplerEphemeris` (кеплеровы элементы JPL), который даёт те же позиции с
-> точностью до ~0.005 а.е. Никаких ручных шагов на Windows не требуется.
+## Assets and dependencies
 
-## Управление
-
-- **ЛКМ** — выбрать тело и сфокусировать камеру.
-- **ПКМ** (зажать + двигать) — повернуть камеру.
-- **Колесо** — зум (орбита) или скорость (полёт).
-- **F** — переключить орбита ↔ свободный полёт.
-- **WASD + Q/E** — движение в свободном полёте (Shift — быстрее).
-- **ESC** — выход.
-
-## Лицензии ассетов
-
-- **Шрифт** `assets/fonts/DejaVuSans.ttf` — DejaVu Fonts (свободная лицензия на
-  основе Bitstream Vera и Arev), содержит кириллицу для UI.
-- **Текстуры и модели** планет — public domain / CC BY 4.0 (NASA 3D Resources,
-  Solar System Scope). Будут добавлены на фазе рендер-полировки; источники и
-  атрибуция появятся здесь.
+DejaVu Sans is bundled for multilingual text; see the [DejaVu Fonts license](https://dejavu-fonts.github.io/License.html).
+raylib, Dear ImGui, rlImGui and optional libnova retain their respective licenses.

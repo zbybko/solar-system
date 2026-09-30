@@ -10,6 +10,7 @@
 
 #include "raylib.h"
 #include "RenderContext.hpp"
+#include "Localization.hpp"
 #include "ephemeris/IEphemeris.hpp"
 
 #include <string>
@@ -39,7 +40,7 @@ public:
     virtual void rebuildOrbit(const IEphemeris& /*ephemeris*/) {}
 
     // Тип тела для UI («Звезда» / «Планета» / «Спутник»).
-    virtual const char* typeName() const = 0;
+    virtual BodyKind kind() const = 0;
 
     // Освещается ли тело внешним источником. Звезда сама светит — false.
     virtual bool isLit() const { return true; }

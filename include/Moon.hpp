@@ -22,7 +22,7 @@ public:
 
     void update(double jd, const IEphemeris& ephemeris) override;
     void draw(const RenderContext& ctx) const override;
-    const char* typeName() const override { return "Спутник"; }
+    BodyKind kind() const override { return BodyKind::Moon; }
 
 private:
     const CelestialBody& parent_;   // агрегация: не владеем родителем

@@ -18,7 +18,7 @@ public:
     void draw(const RenderContext& ctx) const override;
 
     bool isLit() const override { return false; } // звезда светит сама
-    const char* typeName() const override { return "Звезда"; }
+    BodyKind kind() const override { return BodyKind::Star; }
 };
 
 } // namespace solar

@@ -25,7 +25,7 @@ public:
     void draw(const RenderContext& ctx) const override;
     void drawOrbit(const RenderContext& ctx) const override;
     void rebuildOrbit(const IEphemeris& ephemeris) override;
-    const char* typeName() const override { return "Планета"; }
+    BodyKind kind() const override { return BodyKind::Planet; }
 
 private:
     double orbitalPeriodDays_;

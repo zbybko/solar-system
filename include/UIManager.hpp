@@ -8,6 +8,7 @@
 // main лишь читает геттеры и применяет их к системе и рендеру.
 
 #include "RenderContext.hpp"
+#include "Localization.hpp"
 
 namespace solar {
 
@@ -17,6 +18,7 @@ class CelestialBody;
 
 class UIManager {
 public:
+    explicit UIManager(Language language = Language::English) : language_(language) {}
     // Нарисовать все панели. Может изменить часы, камеру и снять выделение
     // (selected зануляется по кнопке «Сбросить вид»).
     void draw(SimulationClock& clock, CameraController& camera,
@@ -33,8 +35,10 @@ public:
     int providerIndex() const { return provider_; } // 0 — libnova, 1 — Kepler
 
 private:
+    const char* tr(Text key) const { return text(key, language_); }
     void drawInfoPanel(const CelestialBody* selected) const;
 
+    Language language_;
     int scaleMode_{0};
     bool showOrbits_{true};
     bool showGrid_{false};

@@ -1,99 +1,110 @@
 #include "UIManager.hpp"
-
 #include "SimulationClock.hpp"
 #include "CameraController.hpp"
 #include "CelestialBody.hpp"
-
 #include "imgui.h"
-
 #include <cmath>
 
 namespace solar {
+namespace {
+Text nameKey(const CelestialBody& body) {
+    if (body.kind() == BodyKind::Moon) return Text::Moon;
+    switch (body.id()) {
+        case BodyId::Sun: return Text::Sun;
+        case BodyId::Mercury: return Text::Mercury;
+        case BodyId::Venus: return Text::Venus;
+        case BodyId::Earth: return Text::Earth;
+        case BodyId::Mars: return Text::Mars;
+        case BodyId::Jupiter: return Text::Jupiter;
+        case BodyId::Saturn: return Text::Saturn;
+        case BodyId::Uranus: return Text::Uranus;
+        case BodyId::Neptune: return Text::Neptune;
+    }
+    return Text::Sun;
+}
+Text kindKey(BodyKind kind) {
+    switch (kind) {
+        case BodyKind::Star: return Text::StarType;
+        case BodyKind::Planet: return Text::PlanetType;
+        case BodyKind::Moon: return Text::MoonType;
+    }
+    return Text::PlanetType;
+}
+} // namespace
 
 void UIManager::draw(SimulationClock& clock, CameraController& camera,
                      CelestialBody*& selected) {
-    // Стартовые позиция/размер (пользователь может перетащить/растянуть).
     ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(360, 470), ImGuiCond_FirstUseEver);
-    ImGui::Begin(u8"Панель управления");
-
-    // --- Провайдер эфемерид (паттерн «Стратегия») ---
-    ImGui::TextUnformatted(u8"Провайдер эфемерид:");
-#ifdef HAVE_LIBNOVA
-    const char* providers[] = {u8"libnova (VSOP87)", u8"Kepler (элементы JPL)"};
-#else
-    const char* providers[] = {u8"Kepler (элементы JPL)"};
-#endif
-    ImGui::Combo(u8"##provider", &provider_, providers, IM_ARRAYSIZE(providers));
+    ImGui::SetNextWindowSize(ImVec2(390, 590), ImGuiCond_FirstUseEver);
+    ImGui::Begin(tr(Text::Controls));
+    ImGui::TextUnformatted(tr(Text::LanguageLabel));
+    int language = static_cast<int>(language_);
+    const char* languages[] = {"English", "Deutsch", "Русский"};
+    if (ImGui::Combo("##language", &language, languages, IM_ARRAYSIZE(languages))) {
+        language_ = static_cast<Language>(language);
+        SetWindowTitle(tr(Text::AppTitle));
+    }
     ImGui::Separator();
-
-    // --- Камера ---
+    ImGui::TextUnformatted(tr(Text::Provider));
+#ifdef HAVE_LIBNOVA
+    const char* providers[] = {"libnova (VSOP87)", tr(Text::Kepler)};
+#else
+    const char* providers[] = {tr(Text::Kepler)};
+#endif
+    ImGui::Combo("##provider", &provider_, providers, IM_ARRAYSIZE(providers));
+    ImGui::Separator();
     const bool orbital = camera.mode() == CameraController::Mode::Orbital;
-    ImGui::Text(u8"Камера: %s", orbital ? u8"орбита" : u8"свободный полёт");
-    if (ImGui::Button(orbital ? u8"В свободный полёт" : u8"В режим орбиты"))
-        camera.toggleMode();
-    if (ImGui::Button(u8"Сбросить вид")) {
+    ImGui::Text("%s: %s", tr(Text::Camera), tr(orbital ? Text::Orbital : Text::Free));
+    if (ImGui::Button(tr(orbital ? Text::SwitchFree : Text::SwitchOrbit))) camera.toggleMode();
+    if (ImGui::Button(tr(Text::ResetView))) {
         selected = nullptr;
         camera.focusOn(Vector3{0.f, 0.f, 0.f}, 7.0f);
     }
-    ImGui::TextWrapped(u8"ЛКМ — выбрать тело, ПКМ — поворот, колесо — "
-                       u8"зум/скорость, F — режим, WASD+QE — полёт");
+    ImGui::TextWrapped("%s", tr(Text::Instructions));
     ImGui::Separator();
-
-    // --- Отображение ---
-    ImGui::TextUnformatted(u8"Отображение:");
-    ImGui::RadioButton(u8"Компактный масштаб", &scaleMode_, 0);
+    ImGui::TextUnformatted(tr(Text::Display));
+    ImGui::RadioButton(tr(Text::Compact), &scaleMode_, 0);
     ImGui::SameLine();
-    ImGui::RadioButton(u8"Реальный", &scaleMode_, 1);
-    ImGui::Checkbox(u8"Орбиты", &showOrbits_);
+    ImGui::RadioButton(tr(Text::Real), &scaleMode_, 1);
+    ImGui::Checkbox(tr(Text::Orbits), &showOrbits_);
     ImGui::SameLine();
-    ImGui::Checkbox(u8"Сетка", &showGrid_);
-    ImGui::SliderFloat(u8"Фон. свет", &ambient_, 0.0f, 0.5f, "%.2f");
+    ImGui::Checkbox(tr(Text::Grid), &showGrid_);
+    ImGui::SetNextItemWidth(150);
+    ImGui::SliderFloat(tr(Text::Ambient), &ambient_, 0.0f, 0.5f, "%.2f");
     ImGui::Separator();
-
-    // --- Время ---
-    ImGui::TextUnformatted(u8"Время:");
+    ImGui::TextUnformatted(tr(Text::Time));
     bool paused = clock.isPaused();
-    if (ImGui::Checkbox(u8"Пауза", &paused))
-        clock.setPaused(paused);
+    if (ImGui::Checkbox(tr(Text::Pause), &paused)) clock.setPaused(paused);
     float speed = static_cast<float>(clock.speed());
-    if (ImGui::SliderFloat(u8"Скорость (сут/с)", &speed, 0.0f, 100.0f, "%.1f"))
-        clock.setSpeed(speed);
-    ImGui::SameLine();
-    if (ImGui::Button(u8"Сброс"))
-        clock.reset();
-    ImGui::Text(u8"JD = %.4f", clock.julianDay());
+    ImGui::SetNextItemWidth(150);
+    if (ImGui::SliderFloat(tr(Text::Speed), &speed, 0.0f, 100.0f, "%.1f")) clock.setSpeed(speed);
+    if (ImGui::Button(tr(Text::ResetTime))) clock.reset();
+    ImGui::Text("JD = %.4f", clock.julianDay());
     ImGui::Separator();
     ImGui::Text("FPS: %d", GetFPS());
-
     ImGui::End();
-
     drawInfoPanel(selected);
 }
 
 void UIManager::drawInfoPanel(const CelestialBody* selected) const {
-    if (selected == nullptr)
-        return;
-
-    ImGui::SetNextWindowPos(ImVec2(GetScreenWidth() - 290.f, 10.f), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(280, 260), ImGuiCond_FirstUseEver);
-    ImGui::Begin(u8"Информация о теле");
-    ImGui::Text(u8"%s", selected->name().c_str());
-    ImGui::Text(u8"Тип: %s", selected->typeName());
+    if (!selected) return;
+    ImGui::SetNextWindowPos(ImVec2(GetScreenWidth() - 350.f, 10.f), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(340, 300), ImGuiCond_FirstUseEver);
+    ImGui::Begin(tr(Text::BodyInfo));
+    ImGui::TextUnformatted(tr(nameKey(*selected)));
+    ImGui::TextWrapped("%s: %s", tr(Text::Type), tr(kindKey(selected->kind())));
     ImGui::Separator();
-
     const Vector3 p = selected->worldPosition();
     const float dist = std::sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
-    ImGui::Text(u8"Радиус (модель): %.2f", selected->radius());
-    ImGui::Text(u8"Наклон оси: %.2f°", selected->axialTilt());
-    ImGui::Text(u8"Период вращения: %.2f ч", selected->rotationPeriodHours());
+    ImGui::Text("%s: %.2f", tr(Text::Radius), selected->radius());
+    ImGui::Text("%s: %.2f°", tr(Text::Tilt), selected->axialTilt());
+    ImGui::Text("%s: %.2f", tr(Text::Rotation), selected->rotationPeriodHours());
     ImGui::Separator();
-    ImGui::Text(u8"Гелиоцентр. позиция (а.е.):");
-    ImGui::Text(u8"  x = %+.4f", p.x);
-    ImGui::Text(u8"  y = %+.4f", p.y);
-    ImGui::Text(u8"  z = %+.4f", p.z);
-    ImGui::Text(u8"Расстояние от Солнца: %.4f а.е.", dist);
+    ImGui::TextWrapped("%s:", tr(Text::Position));
+    ImGui::Text("  x = %+.4f", p.x);
+    ImGui::Text("  y = %+.4f", p.y);
+    ImGui::Text("  z = %+.4f", p.z);
+    ImGui::TextWrapped("%s: %.4f", tr(Text::Distance), dist);
     ImGui::End();
 }
-
 } // namespace solar

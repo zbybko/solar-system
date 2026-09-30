@@ -6,12 +6,26 @@ cmake_minimum_required(VERSION 3.21)
 
 project(solar-system
     VERSION 0.1.0
-    DESCRIPTION "Объектная 3D-модель Солнечной системы"
+    DESCRIPTION "Interactive C++17 solar system visualization"
     LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+include(CTest)
+option(SOLAR_BUILD_APP "Build the graphical application" ON)
+if(BUILD_TESTING)
+    add_executable(localization-test tests/localization_test.cpp)
+    target_include_directories(localization-test PRIVATE include)
+    if(MSVC)
+        target_compile_options(localization-test PRIVATE /utf-8)
+    endif()
+    add_test(NAME localization COMMAND localization-test)
+endif()
+if(NOT SOLAR_BUILD_APP)
+    return()
+endif()
 
 # Единый каталог для исполняемого файла (чтобы рядом лежали assets/).
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -101,7 +115,7 @@ endif()
 
 # --- Предупреждения ------------------------------------------------------
 if(MSVC)
-    target_compile_options(solar-system PRIVATE /W4)
+    target_compile_options(solar-system PRIVATE /W4 /utf-8)
     # std::getenv и т.п. помечены в MSVC как «небезопасные» (C4996) — глушим,
     # код переносимый и стандартный.
     target_compile_definitions(solar-system PRIVATE _CRT_SECURE_NO_WARNINGS)

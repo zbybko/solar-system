@@ -1,0 +1,10 @@
+name: Checks
+on: [push, pull_request]
+jobs:
+  localization:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cmake -S . -B out/tests -DSOLAR_BUILD_APP=OFF -DBUILD_TESTING=ON
+      - run: cmake --build out/tests
+      - run: ctest --test-dir out/tests --output-on-failure
