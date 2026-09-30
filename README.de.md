@@ -25,6 +25,7 @@ mit WebGL und Maus. Jeder Push auf `main` aktualisiert die Demo automatisch übe
 - Beleuchtung durch die Sonne, Sternenhintergrund und Informationen zum gewählten Körper.
 - Oberflächentexturen für Sonne, Planeten und Mond mit korrigierter Polausrichtung.
 - Sprachwechsel zwischen **Deutsch, Englisch und Russisch**, ohne Neustart.
+- Vollbildmodus im Browser mit Ausstieg per Schaltfläche oder Escape sowie eigenem Favicon.
 - Austauschbare Ephemeridenmodelle: Kepler/JPL und optional libnova.
 
 ## Technischer Hintergrund
@@ -55,3 +56,14 @@ Englisch ist die Standardsprache; Russisch bleibt verfügbar.
 Benötigt werden ein C++17-Compiler, CMake ab 3.21, Ninja und vcpkg.
 Die vollständige Anleitung für Windows, macOS und Linux sowie Tests und bekannte
 Einschränkungen stehen im [englischen README](README.md#build-and-run).
+
+## Lizenz
+
+Eigener Projektcode, Dokumentation und Favicon stehen unter der [MIT-Lizenz](LICENSE),
+copyright © 2026 Zakhar Bybko. Forks, Änderungen und auch kommerzielle Nutzung sind erlaubt;
+Urheberrechts- und Lizenzhinweise müssen erhalten bleiben.
+
+Bei veröffentlichten Ableitungen freue ich mich über einen sichtbaren Verweis auf
+[Solar System von Zakhar Bybko](https://github.com/zbybko/solar-system).
+Das ist eine Bitte und keine zusätzliche Lizenzbedingung.
+Texturen, Schriften und Drittanbieter-Bibliotheken behalten ihre jeweiligen Lizenzen.

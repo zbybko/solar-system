@@ -126,6 +126,7 @@ target_link_libraries(solar-system PRIVATE
     rlImGui              # транзитивно тянет raylib и imgui::imgui (PUBLIC)
 )
 if(EMSCRIPTEN)
+    configure_file(web/favicon.svg "${CMAKE_BINARY_DIR}/web/favicon.svg" COPYONLY)
     set_target_properties(solar-system PROPERTIES
         OUTPUT_NAME index SUFFIX ".html"
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/web")

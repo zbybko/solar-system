@@ -33,6 +33,7 @@ completed milestones and remaining finalization tasks.
 - Sun lighting, a starfield and an information panel with coordinates and rotation parameters.
 - Bundled Sun, planet and Moon textures with Y-up poles and equirectangular UV mapping.
 - Live **English / Deutsch / Русский** switching in the control panel.
+- Full-screen browser view with an exit button or Escape, and a custom solar-system favicon.
 - Two interchangeable ephemeris providers: built-in Kepler/JPL calculations and optional libnova.
 
 ## Engineering
@@ -142,3 +143,17 @@ see [surface map credits](assets/textures/README.md).
 raylib, Dear ImGui, rlImGui and optional libnova retain their respective licenses.
 Physical planet sizes use [NASA/JPL mean radii](https://ssd.jpl.nasa.gov/planets/phys_par.html),
 with a nominal solar radius of 695,700 km and a lunar mean radius of 1,737.4 km.
+
+## License and attribution
+
+Original project code, documentation and the favicon are licensed under the [MIT License](LICENSE),
+copyright © 2026 Zakhar Bybko. Forking, modifying and using the code, including commercially,
+is permitted. Retain the copyright and license notices in copies or substantial portions of the code.
+
+If you publish a derivative demo, a visible credit such as
+“Based on [Solar System by Zakhar Bybko](https://github.com/zbybko/solar-system)”
+would be appreciated. This is a request, not an additional MIT license condition.
+
+Third-party textures, fonts and dependencies are **not relicensed under MIT**.
+They retain their own licenses and attribution requirements, including CC BY 4.0 for the surface maps
+and the DejaVu font license; see the asset credits and dependencies above.

@@ -51,6 +51,9 @@ int main() {
     const auto language = solar::languageFromCode(languageEnv ? languageEnv : "en");
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(screenWidth, screenHeight, solar::text(solar::Text::AppTitle, language));
+#ifdef __EMSCRIPTEN__
+    SetExitKey(KEY_NULL); // Escape belongs to the browser's fullscreen controls.
+#endif
     SetTargetFPS(60);
 
     // ImGui с кириллическим шрифтом (см. фазу 5).
