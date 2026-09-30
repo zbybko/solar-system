@@ -2,6 +2,7 @@
 #include "SimulationClock.hpp"
 #include "CameraController.hpp"
 #include "CelestialBody.hpp"
+#include "SolarSystem.hpp"
 #include "imgui.h"
 #include <cmath>
 
@@ -33,9 +34,9 @@ Text kindKey(BodyKind kind) {
 } // namespace
 
 void UIManager::draw(SimulationClock& clock, CameraController& camera,
-                     CelestialBody*& selected) {
+                     CelestialBody*& selected, const SolarSystem& system) {
     ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(390, 590), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(390, 680), ImGuiCond_FirstUseEver);
     ImGui::Begin(tr(Text::Controls));
     ImGui::TextUnformatted(tr(Text::LanguageLabel));
     int language = static_cast<int>(language_);
@@ -61,14 +62,27 @@ void UIManager::draw(SimulationClock& clock, CameraController& camera,
         camera.focusOn(Vector3{0.f, 0.f, 0.f}, 7.0f);
     }
     ImGui::TextWrapped("%s", tr(Text::Instructions));
+    if (ImGui::BeginCombo(tr(Text::SelectBody), selected ? tr(nameKey(*selected)) : "—")) {
+        for (const auto& body : system.bodies()) {
+            if (ImGui::Selectable(tr(nameKey(*body)), selected == body.get())) {
+                selected = body.get();
+                RenderContext ctx;
+                ctx.scale = scale();
+                camera.focusOn(selected->renderPosition(ctx), selected->renderRadius(ctx));
+            }
+        }
+        ImGui::EndCombo();
+    }
     ImGui::Separator();
     ImGui::TextUnformatted(tr(Text::Display));
     ImGui::RadioButton(tr(Text::Compact), &scaleMode_, 0);
     ImGui::SameLine();
     ImGui::RadioButton(tr(Text::Real), &scaleMode_, 1);
+    if (scaleMode_ == 1) ImGui::TextWrapped("%s", tr(Text::RealScaleHint));
     ImGui::Checkbox(tr(Text::Orbits), &showOrbits_);
     ImGui::SameLine();
     ImGui::Checkbox(tr(Text::Grid), &showGrid_);
+    ImGui::Checkbox(tr(Text::SelectionWireframe), &showSelectionWireframe_);
     ImGui::SetNextItemWidth(150);
     ImGui::SliderFloat(tr(Text::Ambient), &ambient_, 0.0f, 0.5f, "%.2f");
     ImGui::Separator();
@@ -96,7 +110,7 @@ void UIManager::drawInfoPanel(const CelestialBody* selected) const {
     ImGui::Separator();
     const Vector3 p = selected->worldPosition();
     const float dist = std::sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
-    ImGui::Text("%s: %.2f", tr(Text::Radius), selected->radius());
+    ImGui::Text("%s: %.1f", tr(Text::Radius), selected->physicalRadiusKm());
     ImGui::Text("%s: %.2f°", tr(Text::Tilt), selected->axialTilt());
     ImGui::Text("%s: %.2f", tr(Text::Rotation), selected->rotationPeriodHours());
     ImGui::Separator();

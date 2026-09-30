@@ -132,7 +132,8 @@ void Planet::draw(const RenderContext& ctx) const {
         rlPushMatrix();
         rlTranslatef(p.x, p.y, p.z);
         rlRotatef(axialTilt_, 0.f, 0.f, 1.f); // кольцо в экваториальной плоскости
-        drawRing(ringInner_ * ctx.radiusScale, ringOuter_ * ctx.radiusScale,
+        const float ringScale = renderRadius(ctx) / radius_;
+        drawRing(ringInner_ * ringScale, ringOuter_ * ringScale,
                  IsTextureValid(ringTexture_) ? WHITE : ringColor_, ringTexture_);
         rlPopMatrix();
     }

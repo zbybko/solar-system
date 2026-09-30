@@ -75,7 +75,7 @@ void CelestialBody::renderSphere(const RenderContext& ctx) const {
     rlTranslatef(p.x, p.y, p.z);
     rlRotatef(axialTilt_, 0.f, 0.f, 1.f);     // наклон оси вращения
     rlRotatef(rotationAngle_, 0.f, 1.f, 0.f); // суточное вращение
-    DrawModel(model_, Vector3{0.f, 0.f, 0.f}, ctx.radiusScale, WHITE);
+    DrawModel(model_, Vector3{0.f, 0.f, 0.f}, renderRadius(ctx) / radius_, WHITE);
     rlPopMatrix();
 }
 

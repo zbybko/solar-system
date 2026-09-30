@@ -15,6 +15,7 @@ namespace solar {
 class SimulationClock;
 class CameraController;
 class CelestialBody;
+class SolarSystem;
 
 class UIManager {
 public:
@@ -22,7 +23,7 @@ public:
     // Нарисовать все панели. Может изменить часы, камеру и снять выделение
     // (selected зануляется по кнопке «Сбросить вид»).
     void draw(SimulationClock& clock, CameraController& camera,
-              CelestialBody*& selected);
+              CelestialBody*& selected, const SolarSystem& system);
 
     // Текущее состояние вида (читает main при рендере).
     RenderContext::Scale scale() const {
@@ -31,6 +32,7 @@ public:
     }
     bool showOrbits() const { return showOrbits_; }
     bool showGrid() const { return showGrid_; }
+    bool showSelectionWireframe() const { return showSelectionWireframe_; }
     float ambient() const { return ambient_; }
     int providerIndex() const { return provider_; } // 0 — libnova, 1 — Kepler
 
@@ -42,6 +44,7 @@ private:
     int scaleMode_{0};
     bool showOrbits_{true};
     bool showGrid_{false};
+    bool showSelectionWireframe_{false};
     float ambient_{0.12f};
     int provider_{0};
 };

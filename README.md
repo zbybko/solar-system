@@ -25,7 +25,8 @@ completed milestones and remaining finalization tasks.
 - Sun, eight planets, Earth's Moon and Saturn's rings.
 - Orbit and free-flight cameras, mouse selection and body tracking.
 - Simulation pause, adjustable time speed, orbit paths and a reference grid.
-- Compact and real-distance views; body sizes remain exaggerated for readability.
+- Compact view with exaggerated bodies, or real distances **and physical body sizes** using one consistent AU scale.
+- Body selector with automatic camera focus, and an optional selection wireframe (off by default).
 - Sun lighting, a starfield and an information panel with coordinates and rotation parameters.
 - Bundled Sun, planet and Moon textures with Y-up poles and equirectangular UV mapping.
 - Live **English / Deutsch / Русский** switching in the control panel.
@@ -115,14 +116,14 @@ cmake --build out/tests
 ctest --test-dir out/tests --output-on-failure
 ```
 
-The tests verify translations, stable widget IDs, language fallback and surface mapping
-(latitude, longitude, pole orientation and lighting normals).
+The tests verify translations, stable widget IDs, language fallback, surface mapping
+(latitude, longitude, pole orientation and lighting normals), and physical radius/AU scale ratios.
 CI runs these checks; it does not replace graphical or numerical validation.
 
 ## Limitations
 
 - The built-in Moon model uses a simplified circular orbit. Planet positions are approximations.
-- Compact mode, model radii and the Moon's displayed distance are intentionally exaggerated.
+- Only compact mode exaggerates body radii and the Moon's displayed distance. In real-distance mode, bodies are tiny at system-wide zoom; use **Select body** to inspect them. Both modes represent bodies as spheres, not oblate ellipsoids; ring proportions remain approximate.
 - Surface maps are static reference images; seasonal changes, clouds and atmospheric scattering are not simulated.
 - An earlier version reported a transparent-window issue with GLFW/OpenGL on macOS 26. Window presentation can depend on the OS and graphics stack.
 - No ROS integration, robot control or N-body gravitational solver is implemented.
@@ -133,3 +134,5 @@ DejaVu Sans is bundled for multilingual text; see the [DejaVu Fonts license](htt
 Planet, Sun, Moon and ring textures are by Solar System Scope / INOVE under CC BY 4.0;
 see [surface map credits](assets/textures/README.md).
 raylib, Dear ImGui, rlImGui and optional libnova retain their respective licenses.
+Physical planet sizes use [NASA/JPL mean radii](https://ssd.jpl.nasa.gov/planets/phys_par.html),
+with a nominal solar radius of 695,700 km and a lunar mean radius of 1,737.4 km.

@@ -17,15 +17,24 @@ Moon::Moon(std::string name, BodyId parentId, const CelestialBody& parent,
 }
 
 void Moon::update(double jd, const IEphemeris& ephemeris) {
-    // Реальное геоцентрическое направление от провайдера (а.е.), раздутое
-    // для видимости, прибавляется к позиции родителя.
+    // Keep physical coordinates; exaggerate separation only in compact mode.
     const Vec3 geo = ephemeris.moonGeocentricPosition(jd);
     const Vector3 c = parent_.worldPosition();
+    geocentricPosition_ = {static_cast<float>(geo.x), static_cast<float>(geo.y),
+                          static_cast<float>(geo.z)};
     worldPos_ = Vector3{
-        c.x + static_cast<float>(geo.x) * distanceExaggeration_,
-        c.y + static_cast<float>(geo.y) * distanceExaggeration_,
-        c.z + static_cast<float>(geo.z) * distanceExaggeration_};
+        c.x + geocentricPosition_.x,
+        c.y + geocentricPosition_.y,
+        c.z + geocentricPosition_.z};
     updateRotation(jd);
+}
+
+Vector3 Moon::scaledPosition(const RenderContext& ctx) const {
+    if (ctx.scale == RenderContext::Scale::Real) return ctx.toWorld(worldPos_);
+    const Vector3 c = parent_.worldPosition();
+    return ctx.toWorld({c.x + geocentricPosition_.x * distanceExaggeration_,
+                        c.y + geocentricPosition_.y * distanceExaggeration_,
+                        c.z + geocentricPosition_.z * distanceExaggeration_});
 }
 
 void Moon::draw(const RenderContext& ctx) const {

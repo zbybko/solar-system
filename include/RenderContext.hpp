@@ -20,7 +20,7 @@ struct RenderContext {
     Scale scale = Scale::Compact;
     float realScale = 4.0f;    // мировых единиц на а.е. (линейно)
     float compactScale = 7.0f; // множитель sqrt-отображения расстояний
-    float radiusScale = 1.0f;  // множитель радиусов тел
+    float radiusScale = 1.0f;  // множитель отображаемых радиусов только в Compact
 
     // Эклиптические а.е. (x,y,z) → мировые координаты raylib (y — вверх):
     // орбитальная плоскость ложится на плоскость x-z, широта даёт высоту.

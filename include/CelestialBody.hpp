@@ -11,6 +11,7 @@
 #include "raylib.h"
 #include "RenderContext.hpp"
 #include "Localization.hpp"
+#include "PhysicalScale.hpp"
 #include "ephemeris/IEphemeris.hpp"
 
 #include <string>
@@ -57,6 +58,12 @@ public:
     const std::string& name() const { return name_; }
     BodyId id() const { return id_; }
     float radius() const { return radius_; }
+    double physicalRadiusKm() const { return meanRadiusKm(id_, kind()); }
+    float renderRadius(const RenderContext& ctx) const {
+        return ctx.scale == RenderContext::Scale::Real
+            ? physicalRenderRadius(physicalRadiusKm(), ctx.realScale)
+            : radius_ * ctx.radiusScale;
+    }
     float axialTilt() const { return axialTilt_; }
     float rotationPeriodHours() const { return rotationPeriod_; }
 
@@ -71,7 +78,7 @@ protected:
     void renderSphere(const RenderContext& ctx) const;
 
     // Позиция тела в мировых координатах raylib с учётом масштаба контекста.
-    Vector3 scaledPosition(const RenderContext& ctx) const;
+    virtual Vector3 scaledPosition(const RenderContext& ctx) const;
 
     std::string name_;
     BodyId id_;

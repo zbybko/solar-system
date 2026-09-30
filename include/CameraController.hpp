@@ -48,6 +48,7 @@ private:
     // Орбитальный режим: сферические координаты вокруг target_.
     Vector3 target_{0.f, 0.f, 0.f};
     float distance_{55.f};
+    float minDistance_{2.f};
     float yaw_{0.f};    // рад, поворот вокруг вертикали
     float pitch_{0.6f}; // рад, угол возвышения
 

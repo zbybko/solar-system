@@ -17,7 +17,8 @@ mit WebGL und Maus. Jeder Push auf `main` aktualisiert die Demo automatisch übe
 - Sonne, acht Planeten, Erdmond und Saturnringe.
 - Orbitkamera und freier Flug, Objektauswahl per Maus und Kameraverfolgung.
 - Einstellbare Simulationsgeschwindigkeit, Pause, Umlaufbahnen und Raster.
-- Kompakte Darstellung oder reale Abstände bei vergrößerten Körperradien.
+- Kompakte Darstellung mit vergrößerten Körpern oder reale Abstände und Körpergrößen in einem gemeinsamen Maßstab.
+- Himmelskörper-Auswahl mit automatischer Kamerafokussierung und optionalem Auswahlgitter (standardmäßig aus).
 - Beleuchtung durch die Sonne, Sternenhintergrund und Informationen zum gewählten Körper.
 - Oberflächentexturen für Sonne, Planeten und Mond mit korrigierter Polausrichtung.
 - Sprachwechsel zwischen **Deutsch, Englisch und Russisch**, ohne Neustart.
@@ -34,7 +35,7 @@ Der [Entwicklungsplan](ROADMAP.md) dokumentiert die ursprünglichen acht Phasen,
 abgeschlossene Meilensteine und noch offene Abschlussaufgaben (auf Englisch).
 
 Es handelt sich um eine Lernvisualisierung, nicht um ein hochpräzises astronomisches Werkzeug.
-Die Mondbahn ist vereinfacht; Größen und teilweise Abstände sind zur besseren Darstellung überhöht.
+Die Mondbahn ist vereinfacht. Nur im kompakten Modus sind Körpergrößen und Mondabstand überhöht. Im realen Maßstab sind Planeten in der Gesamtansicht sehr klein; die Himmelskörper-Auswahl ermöglicht die Nahansicht. Die Körper werden als Kugeln dargestellt, die Ringproportionen sind angenähert.
 ROS und Robotersteuerung sind nicht Bestandteil des Projekts.
 
 ## Sprache auswählen

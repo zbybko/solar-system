@@ -7,6 +7,7 @@
 // main лишь связывает систему, часы, камеру, рендер и UI.
 
 #include "raylib.h"
+#include "rlgl.h"
 #include "rlImGui.h"
 #include "imgui.h"
 
@@ -97,12 +98,15 @@ int main() {
         }
 
         system.update(clock.julianDay());
+        const bool scaleChanged = rctx.scale != ui.scale();
         rctx.scale = ui.scale();
+        if (scaleChanged && selected)
+            controller.focusOn(selected->renderPosition(rctx), selected->renderRadius(rctx));
 
         if (!focusDone && focusIdx >= 0 &&
             focusIdx < static_cast<int>(system.bodies().size())) {
             selected = system.bodies()[focusIdx].get();
-            controller.focusOn(selected->renderPosition(rctx), selected->radius());
+            controller.focusOn(selected->renderPosition(rctx), selected->renderRadius(rctx));
             focusDone = true;
         }
 
@@ -118,7 +122,7 @@ int main() {
             solar::CelestialBody* hit = system.pickBody(controller.mouseRay(), rctx);
             if (hit) {
                 selected = hit;
-                controller.focusOn(hit->renderPosition(rctx), hit->radius());
+                controller.focusOn(hit->renderPosition(rctx), hit->renderRadius(rctx));
             }
         }
 
@@ -134,6 +138,9 @@ int main() {
         BeginDrawing();
         ClearBackground(Color{4, 4, 10, 255});
 
+        const double nearPlane = rctx.scale == solar::RenderContext::Scale::Real
+            ? (selected ? selected->renderRadius(rctx) * 0.01 : 0.00001) : 0.05;
+        rlSetClipPlanes(nearPlane, 4000.0);
         BeginMode3D(camera);
         renderer.drawStars(camera.position);
         if (ui.showGrid())
@@ -141,15 +148,15 @@ int main() {
         if (ui.showOrbits())
             system.drawOrbits(rctx);
         system.draw(rctx);
-        if (selected) {
+        if (selected && ui.showSelectionWireframe()) {
             const Vector3 c = selected->renderPosition(rctx);
-            DrawSphereWires(c, selected->radius() * rctx.radiusScale * 1.25f, 10, 10,
+            DrawSphereWires(c, selected->renderRadius(rctx) * 1.25f, 10, 10,
                             Color{255, 255, 255, 120});
         }
         EndMode3D();
 
         rlImGuiBegin();
-        ui.draw(clock, controller, selected);
+        ui.draw(clock, controller, selected, system);
         rlImGuiEnd();
 
         EndDrawing();

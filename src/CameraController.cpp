@@ -9,7 +9,6 @@ namespace solar {
 
 namespace {
 constexpr float kPitchLimit = 1.5f;     // ~86°
-constexpr float kMinDistance = 2.f;
 constexpr float kMaxDistance = 600.f;
 constexpr float kRotateSens = 0.005f;
 constexpr float kLookSens = 0.004f;
@@ -40,7 +39,8 @@ void CameraController::applyOrbital() {
 void CameraController::focusOn(Vector3 worldPos, float bodyRadius) {
     mode_ = Mode::Orbital;
     target_ = worldPos;
-    distance_ = clampf(bodyRadius * 8.f, 4.f, 120.f);
+    minDistance_ = std::max(bodyRadius * 1.2f, 0.000001f);
+    distance_ = clampf(bodyRadius * 8.f, minDistance_, 120.f);
     applyOrbital();
 }
 
@@ -57,8 +57,8 @@ void CameraController::setMode(Mode mode) {
         // Восстановить сферические координаты из текущего положения камеры
         // относительно цели, чтобы переход был плавным.
         const Vector3 off = Vector3Subtract(camera_.position, target_);
-        distance_ = clampf(Vector3Length(off), kMinDistance, kMaxDistance);
-        if (distance_ > 0.001f) {
+        distance_ = clampf(Vector3Length(off), minDistance_, kMaxDistance);
+        if (distance_ > 0.000001f) {
             pitch_ = std::asin(clampf(off.y / distance_, -1.f, 1.f));
             yaw_ = std::atan2(off.x, off.z);
         }
@@ -94,7 +94,7 @@ void CameraController::updateOrbital(bool acceptMouse) {
         const float wheel = GetMouseWheelMove();
         if (wheel != 0.f) {
             distance_ *= (1.f - wheel * 0.1f);
-            distance_ = clampf(distance_, kMinDistance, kMaxDistance);
+            distance_ = clampf(distance_, minDistance_, kMaxDistance);
         }
     }
     applyOrbital();

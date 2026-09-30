@@ -12,7 +12,7 @@ enum class Text {
     Orbits, Grid, Ambient, Time, Pause, Speed, ResetTime, BodyInfo, Type,
     Radius, Tilt, Rotation, Position, Distance,
     Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune, Moon,
-    StarType, PlanetType, MoonType, Count
+    StarType, PlanetType, MoonType, SelectionWireframe, SelectBody, RealScaleHint, Count
 };
 // Translated presentation strings; stable IDs preserve ImGui state across languages.
 inline constexpr std::array<std::array<const char*, 3>, static_cast<std::size_t>(Text::Count)> translations{{
@@ -42,7 +42,7 @@ inline constexpr std::array<std::array<const char*, 3>, static_cast<std::size_t>
     {"Reset time###resetTime", "Zeit zurücksetzen###resetTime", "Сбросить время###resetTime"},
     {"Body information###bodyInfo", "Himmelskörper###bodyInfo", "Информация о теле###bodyInfo"},
     {"Type", "Typ", "Тип"},
-    {"Model radius", "Modellradius", "Радиус модели"},
+    {"Mean radius (km)", "Mittlerer Radius (km)", "Средний радиус (км)"},
     {"Axial tilt", "Achsenneigung", "Наклон оси"},
     {"Rotation period (h)", "Rotationsdauer (h)", "Период вращения (ч)"},
     {"Heliocentric position (AU)", "Heliozentrische Position (AE)", "Гелиоцентрическая позиция (а.е.)"},
@@ -53,7 +53,10 @@ inline constexpr std::array<std::array<const char*, 3>, static_cast<std::size_t>
     {"Saturn", "Saturn", "Сатурн"}, {"Uranus", "Uranus", "Уран"},
     {"Neptune", "Neptun", "Нептун"}, {"Moon", "Mond", "Луна"},
     {"Star", "Stern", "Звезда"}, {"Planet", "Planet", "Планета"},
-    {"Natural satellite", "Natürlicher Satellit", "Спутник"}
+    {"Natural satellite", "Natürlicher Satellit", "Спутник"},
+    {"Selection wireframe###selectionWireframe", "Auswahlgitter###selectionWireframe", "Сетка выделения###selectionWireframe"},
+    {"Select body###selectBody", "Himmelskörper wählen###selectBody", "Выбрать тело###selectBody"},
+    {"True sizes and distances. Use the body selector to inspect tiny planets.", "Reale Größen und Abstände. Kleine Planeten über die Auswahl betrachten.", "Реальные размеры и расстояния. Используйте список для приближения к планетам."}
 }};
 inline const char* text(Text key, Language language) {
     return translations.at(static_cast<std::size_t>(key)).at(static_cast<std::size_t>(language));

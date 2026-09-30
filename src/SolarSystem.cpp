@@ -79,7 +79,7 @@ CelestialBody* SolarSystem::pickBody(const Ray& ray, const RenderContext& ctx) c
     float nearestDist = 0.f;
     for (const auto& body : bodies_) {
         const Vector3 center = body->renderPosition(ctx);
-        const float radius = body->radius() * ctx.radiusScale;
+        const float radius = body->renderRadius(ctx);
         const RayCollision hit = GetRayCollisionSphere(ray, center, radius);
         if (hit.hit && (nearest == nullptr || hit.distance < nearestDist)) {
             nearest = body.get();

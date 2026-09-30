@@ -25,6 +25,8 @@ public:
     BodyKind kind() const override { return BodyKind::Moon; }
 
 private:
+    Vector3 scaledPosition(const RenderContext& ctx) const override;
+    Vector3 geocentricPosition_{};
     const CelestialBody& parent_;   // агрегация: не владеем родителем
     float distanceExaggeration_;    // во сколько раз раздуть расстояние до родителя
 };
