@@ -5,6 +5,11 @@ Planetenbewegungen erkunden, Berechnungsmodelle wechseln und Himmelskörper unte
 
 [English: full documentation](README.md)
 
+**[Interaktive Demo im Browser starten](https://zbybko.github.io/solar-system/)**
+
+Die WebAssembly-Version verwendet das Kepler-Modell. Empfohlen wird ein Desktop-Browser
+mit WebGL und Maus. Jeder Push auf `main` aktualisiert die Demo automatisch über GitHub Actions.
+
 ![Deutsche Benutzeroberfläche mit Erde und Informationsfenster](docs/preview-de.png)
 
 ## Funktionen

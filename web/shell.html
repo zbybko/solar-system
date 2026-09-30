@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore an interactive solar system built in C++ by Zakhar Bybko. Available in English, German and Russian.">
+  <title>Solar System — Zakhar Bybko</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #0a0d16; color: #e9edf7; }
+    body { margin: 0 auto; max-width: 1280px; padding: 24px; }
+    header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    h1 { margin: 0; font-size: 26px; letter-spacing: -.5px; }
+    a { color: #b0c7ff; text-underline-offset: 4px; }
+    p { color: #a9b3c8; line-height: 1.6; }
+    #status { min-height: 24px; font-size: 14px; }
+    canvas { width: 100%; height: auto; display: block; background: #04040a; border-radius: 12px; outline-offset: 4px; }
+    canvas:focus-visible { outline: 2px solid #b0c7ff; }
+    footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; font-size: 14px; margin-top: 16px; }
+    @media (max-width: 700px) { body { padding: 16px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Solar System</h1>
+    <a href="https://github.com/zbybko/solar-system">Source &amp; development roadmap ↗</a>
+  </header>
+  <p>Explore planetary motion. Choose English, Deutsch or Русский in the control panel.</p>
+  <div id="status" role="status" aria-live="polite">Loading the solar system…</div>
+  <canvas id="canvas" width="1280" height="720" tabindex="0" aria-label="Interactive 3D solar system. Click to select a body, right-drag to rotate, scroll to zoom."></canvas>
+  <noscript><p>Please enable JavaScript to run the simulation.</p></noscript>
+  <footer>
+    <span>Click: select · Right-drag: rotate · Scroll: zoom · F: free flight</span>
+    <a href="https://github.com/zbybko">Built by Zakhar Bybko</a>
+  </footer>
+  <script>
+    var canvas = document.getElementById('canvas');
+    var statusElement = document.getElementById('status');
+    canvas.addEventListener('contextmenu', function (event) { event.preventDefault(); });
+    canvas.addEventListener('pointerdown', function () { canvas.focus({ preventScroll: true }); });
+    canvas.addEventListener('webglcontextlost', function (event) {
+      event.preventDefault();
+      statusElement.textContent = 'Graphics connection lost. Reload the page to restart.';
+    });
+    var Module = {
+      canvas: canvas,
+      print: function (message) { console.log(message); },
+      printErr: function (message) { console.error(message); },
+      setStatus: function (message) { statusElement.textContent = message; },
+      onRuntimeInitialized: function () { statusElement.textContent = 'Ready — click the scene to explore. Best experienced on desktop.'; },
+      onAbort: function () { statusElement.textContent = 'Unable to start the simulation. Please try a browser with WebGL enabled.'; }
+    };
+  </script>
+  {{{ SCRIPT }}}
+</body>
+</html>

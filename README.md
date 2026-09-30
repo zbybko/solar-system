@@ -5,6 +5,8 @@ Explore planetary motion, switch orbital models, and inspect celestial bodies in
 
 [Deutsch](README.de.md)
 
+**[Run the interactive browser demo](https://zbybko.github.io/solar-system/)**
+
 ![Solar System running in English: Saturn, orbital controls and body information](docs/preview-en.png)
 
 *Actual application capture using the built-in Kepler provider and colored model surfaces.*
@@ -65,6 +67,10 @@ libnova is optional: CMake detects a system installation; without it the built-i
 
 ## Languages and controls
 
+The [GitHub Pages demo](https://zbybko.github.io/solar-system/) runs the C++ application
+in your browser through WebAssembly, using the Kepler provider. A desktop browser
+with WebGL and a mouse is recommended.
+
 English is the default. Use **Language** in the control panel to switch without restarting.
 The selection lasts for the current session. Set `SS_LANGUAGE=en`, `de` or `ru` to choose a startup language.
 
@@ -77,6 +83,26 @@ The selection lasts for the current session. Set `SS_LANGUAGE=en`, `de` or `ru` 
 | WASD + Q/E | Move in free-flight mode |
 | Shift | Faster flight |
 | Escape | Exit |
+
+Escape exits the native application; close or reload the tab to stop or restart the browser demo.
+
+## Browser build and deployment
+
+Install and activate [Emscripten 4.0.15](https://emscripten.org/docs/getting_started/downloads.html),
+then run with CMake 3.25+ and Ninja available:
+
+```sh
+emcmake cmake -S . -B out/web -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
+cmake --build out/web --parallel 4
+python3 -m http.server 8000 --directory out/web/web
+```
+
+Open `http://localhost:8000`. The web build fetches pinned raylib and Dear ImGui
+sources, bundles fonts and shaders, and uses WebGL-compatible lighting shaders.
+It does not require vcpkg or libnova.
+
+The [Pages workflow](.github/workflows/pages.yml) builds and deploys the demo
+automatically after every push to `main`. It can also be started manually in GitHub Actions.
 
 ## Checks
 

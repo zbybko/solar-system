@@ -13,10 +13,14 @@
 namespace solar {
 
 inline std::string assetPath(const std::string& relative) {
+#ifdef __EMSCRIPTEN__
+    return std::string(ASSETS_DIR) + "/" + relative;
+#else
     const std::string nearExe = std::string(GetApplicationDirectory()) + "assets/" + relative;
     if (FileExists(nearExe.c_str()))
         return nearExe;
     return std::string(ASSETS_DIR) + "/" + relative;
+#endif
 }
 
 } // namespace solar

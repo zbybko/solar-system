@@ -31,11 +31,31 @@ endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # --- Зависимости (через vcpkg) -------------------------------------------
+if(EMSCRIPTEN)
+    include(FetchContent)
+    set(PLATFORM Web CACHE STRING "raylib platform" FORCE)
+    set(BUILD_EXAMPLES OFF CACHE BOOL "raylib examples" FORCE)
+    FetchContent_Declare(raylib
+        GIT_REPOSITORY https://github.com/raysan5/raylib.git
+        GIT_TAG dbc56a87da87d973a9c5baa4e7438a9d20121d28)
+    FetchContent_Declare(imgui
+        GIT_REPOSITORY https://github.com/ocornut/imgui.git
+        GIT_TAG 8936b58fe26e8c3da834b8f60b06511d537b4c63)
+    FetchContent_MakeAvailable(raylib imgui)
+    add_library(imgui STATIC
+        ${imgui_SOURCE_DIR}/imgui.cpp
+        ${imgui_SOURCE_DIR}/imgui_draw.cpp
+        ${imgui_SOURCE_DIR}/imgui_tables.cpp
+        ${imgui_SOURCE_DIR}/imgui_widgets.cpp)
+    target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
+    add_library(imgui::imgui ALIAS imgui)
+else()
 find_package(raylib CONFIG REQUIRED)
 # raylib в vcpkg собирается с внешним glfw3, но не пробрасывает эту
 # зависимость в своих CMake-таргетах — линкуем её явно.
 find_package(glfw3 CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
+endif()
 
 # libnova — ОПЦИОНАЛЬНЫЙ провайдер эфемерид. В реестре vcpkg её нет; если она
 # установлена системно (macOS — 'brew install libnova', Debian/Ubuntu —
@@ -48,7 +68,7 @@ find_path(LIBNOVA_INCLUDE_DIR
 find_library(LIBNOVA_LIBRARY
     NAMES nova libnova
     HINTS /opt/homebrew/lib /usr/local/lib /usr/lib)
-if(LIBNOVA_INCLUDE_DIR AND LIBNOVA_LIBRARY)
+if(NOT EMSCRIPTEN AND LIBNOVA_INCLUDE_DIR AND LIBNOVA_LIBRARY)
     set(HAVE_LIBNOVA TRUE)
     message(STATUS "libnova найдена: ${LIBNOVA_LIBRARY} — провайдер LibnovaEphemeris включён")
 else()
@@ -87,13 +107,33 @@ target_include_directories(solar-system PRIVATE
 
 # Путь к ассетам известен на этапе компиляции — приложение находит шрифты и
 # текстуры независимо от текущего рабочего каталога при запуске.
-target_compile_definitions(solar-system PRIVATE
-    ASSETS_DIR="${CMAKE_SOURCE_DIR}/assets")
+if(EMSCRIPTEN)
+    target_compile_definitions(solar-system PRIVATE ASSETS_DIR="/assets")
+else()
+    target_compile_definitions(solar-system PRIVATE ASSETS_DIR="${CMAKE_SOURCE_DIR}/assets")
+endif()
 
 target_link_libraries(solar-system PRIVATE
     rlImGui              # транзитивно тянет raylib и imgui::imgui (PUBLIC)
-    glfw                 # raylib-конфиг vcpkg не пробрасывает glfw — линкуем явно
 )
+if(EMSCRIPTEN)
+    set_target_properties(solar-system PROPERTIES
+        OUTPUT_NAME index SUFFIX ".html"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/web")
+    # raylib's synchronous web loop yields through emscripten_sleep;
+    # Asyncify keeps the existing desktop loop and RAII ownership intact.
+    target_link_options(solar-system PRIVATE
+        "-sASYNCIFY=1" "-sALLOW_MEMORY_GROWTH=1" "-sSTACK_SIZE=1048576"
+        "-sENVIRONMENT=web"
+        "--preload-file" "${CMAKE_SOURCE_DIR}/assets@/assets"
+        "--shell-file" "${CMAKE_SOURCE_DIR}/web/shell.html")
+    set_property(TARGET solar-system APPEND PROPERTY LINK_DEPENDS
+        "${CMAKE_SOURCE_DIR}/web/shell.html"
+        "${CMAKE_SOURCE_DIR}/assets/shaders/lighting-web.vs"
+        "${CMAKE_SOURCE_DIR}/assets/shaders/lighting-web.fs")
+else()
+    target_link_libraries(solar-system PRIVATE glfw)
+endif()
 
 # Подключаем libnova-провайдер только если библиотека найдена (см. выше).
 if(HAVE_LIBNOVA)

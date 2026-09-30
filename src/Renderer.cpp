@@ -8,8 +8,13 @@
 namespace solar {
 
 Renderer::Renderer() {
+#ifdef __EMSCRIPTEN__
+    const std::string vs = assetPath("shaders/lighting-web.vs");
+    const std::string fs = assetPath("shaders/lighting-web.fs");
+#else
     const std::string vs = assetPath("shaders/lighting.vs");
     const std::string fs = assetPath("shaders/lighting.fs");
+#endif
     shader_ = LoadShader(vs.c_str(), fs.c_str());
 
     // Позицию наблюдателя raylib умеет подставлять сам по стандартному имени.

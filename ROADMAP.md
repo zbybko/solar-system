@@ -81,11 +81,14 @@ These additions came after the original eight-stage plan.
 - [x] Publish English documentation, a German overview and actual application previews.
 - [x] Build and capture the English and German application on macOS with the Kepler provider.
 - [x] Restore this development plan as a separate, linked document.
+- [x] Add a WebAssembly browser build with bundled assets and WebGL lighting.
+- [x] Publish the interactive demo on GitHub Pages and automate deployment from `main`.
 
 ## Validation scope
 
 The latest refresh was checked with a macOS application build and startup captures,
-plus automated localization tests locally and on GitHub. Windows and Linux graphical
+plus automated localization tests locally and on GitHub. The browser build was also
+checked for scene rendering and live language switching. Windows and Linux graphical
 builds and the optional libnova path were not revalidated during that refresh.
 Numerical accuracy and the simplified Moon model remain separate concerns; see the
 [project limitations](README.md#limitations).
