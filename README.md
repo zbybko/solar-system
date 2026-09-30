@@ -15,6 +15,9 @@ Originally built as a university object-oriented programming project, Solar Syst
 numerical calculations, real-time graphics and a modular C++ architecture.
 It is an educational visualization, not a mission-planning or high-precision astronomy tool.
 
+See the [development roadmap](ROADMAP.md) for the original eight-stage plan,
+completed milestones and remaining finalization tasks.
+
 ## Features
 
 - Sun, eight planets, Earth's Moon and Saturn's rings.

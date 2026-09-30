@@ -24,6 +24,9 @@ Es verwendet RAII zur Ressourcenverwaltung, `std::unique_ptr` für Besitzverhäl
 und das Strategie-Muster für austauschbare Positionsberechnungen.
 Simulation, Kamera, Rendering und Benutzeroberfläche sind in getrennten Komponenten organisiert.
 
+Der [Entwicklungsplan](ROADMAP.md) dokumentiert die ursprünglichen acht Phasen,
+abgeschlossene Meilensteine und noch offene Abschlussaufgaben (auf Englisch).
+
 Es handelt sich um eine Lernvisualisierung, nicht um ein hochpräzises astronomisches Werkzeug.
 Die Mondbahn ist vereinfacht; Größen und teilweise Abstände sind zur besseren Darstellung überhöht.
 ROS und Robotersteuerung sind nicht Bestandteil des Projekts.
