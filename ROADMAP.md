@@ -32,7 +32,7 @@ it does not imply that every configuration has been tested on every platform.
 - [x] Support textured spheres with a colored fallback, axial tilt and rotation.
 - [x] Manage model resources through RAII and provide polymorphic `update` / `draw` methods.
 
-Texture-loading support is implemented; planet texture assets are not bundled.
+Surface maps were bundled during the portfolio refresh below.
 
 ### 5. Solar system assembly
 
@@ -83,6 +83,8 @@ These additions came after the original eight-stage plan.
 - [x] Restore this development plan as a separate, linked document.
 - [x] Add a WebAssembly browser build with bundled assets and WebGL lighting.
 - [x] Publish the interactive demo on GitHub Pages and automate deployment from `main`.
+- [x] Restore the original Sun, planet, Moon and Saturn-ring maps with source credits.
+- [x] Correct sphere pole orientation and UV mapping; add a surface-mapping regression test.
 
 ## Validation scope
 

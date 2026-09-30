@@ -1,11 +1,14 @@
 #include "Star.hpp"
+#include "AssetPath.hpp"
 
 namespace solar {
 
 Star::Star(std::string name, float radius, float axialTiltDeg,
            float rotationPeriodHours, Color color)
     : CelestialBody(std::move(name), BodyId::Sun, radius, axialTiltDeg,
-                    rotationPeriodHours, color) {}
+                    rotationPeriodHours, color) {
+    loadTexture(assetPath("textures/sun.jpg").c_str());
+}
 
 void Star::update(double jd, const IEphemeris& /*ephemeris*/) {
     worldPos_ = Vector3{0.f, 0.f, 0.f}; // звезда — центр системы

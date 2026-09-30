@@ -22,6 +22,9 @@ if(BUILD_TESTING)
         target_compile_options(localization-test PRIVATE /utf-8)
     endif()
     add_test(NAME localization COMMAND localization-test)
+    add_executable(sphere-mapping-test tests/sphere_mapping_test.cpp)
+    target_include_directories(sphere-mapping-test PRIVATE include)
+    add_test(NAME sphere-mapping COMMAND sphere-mapping-test)
 endif()
 if(NOT SOLAR_BUILD_APP)
     return()
@@ -35,6 +38,7 @@ if(EMSCRIPTEN)
     include(FetchContent)
     set(PLATFORM Web CACHE STRING "raylib platform" FORCE)
     set(BUILD_EXAMPLES OFF CACHE BOOL "raylib examples" FORCE)
+    set(CUSTOMIZE_BUILD OFF CACHE BOOL "Use raylib's default configuration" FORCE)
     FetchContent_Declare(raylib
         GIT_REPOSITORY https://github.com/raysan5/raylib.git
         GIT_TAG dbc56a87da87d973a9c5baa4e7438a9d20121d28)
@@ -42,6 +46,8 @@ if(EMSCRIPTEN)
         GIT_REPOSITORY https://github.com/ocornut/imgui.git
         GIT_TAG 8936b58fe26e8c3da834b8f60b06511d537b4c63)
     FetchContent_MakeAvailable(raylib imgui)
+    # JPEG is disabled in raylib 6's default web build; enable just this format.
+    target_compile_definitions(raylib PRIVATE SUPPORT_FILEFORMAT_JPG=1)
     add_library(imgui STATIC
         ${imgui_SOURCE_DIR}/imgui.cpp
         ${imgui_SOURCE_DIR}/imgui_draw.cpp
@@ -131,6 +137,8 @@ if(EMSCRIPTEN)
         "${CMAKE_SOURCE_DIR}/web/shell.html"
         "${CMAKE_SOURCE_DIR}/assets/shaders/lighting-web.vs"
         "${CMAKE_SOURCE_DIR}/assets/shaders/lighting-web.fs")
+    file(GLOB_RECURSE SOLAR_ASSET_FILES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/assets/*")
+    set_property(TARGET solar-system APPEND PROPERTY LINK_DEPENDS ${SOLAR_ASSET_FILES})
 else()
     target_link_libraries(solar-system PRIVATE glfw)
 endif()

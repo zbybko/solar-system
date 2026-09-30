@@ -19,6 +19,7 @@ mit WebGL und Maus. Jeder Push auf `main` aktualisiert die Demo automatisch übe
 - Einstellbare Simulationsgeschwindigkeit, Pause, Umlaufbahnen und Raster.
 - Kompakte Darstellung oder reale Abstände bei vergrößerten Körperradien.
 - Beleuchtung durch die Sonne, Sternenhintergrund und Informationen zum gewählten Körper.
+- Oberflächentexturen für Sonne, Planeten und Mond mit korrigierter Polausrichtung.
 - Sprachwechsel zwischen **Deutsch, Englisch und Russisch**, ohne Neustart.
 - Austauschbare Ephemeridenmodelle: Kepler/JPL und optional libnova.
 

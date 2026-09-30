@@ -16,6 +16,7 @@ class Planet final : public CelestialBody {
 public:
     Planet(std::string name, BodyId id, float radius, float axialTiltDeg,
            float rotationPeriodHours, double orbitalPeriodDays, Color color);
+    ~Planet() override;
 
     // Включить плоское кольцо в экваториальной плоскости планеты (мировые
     // единицы радиусов). По умолчанию у планеты колец нет.
@@ -33,6 +34,7 @@ private:
     float ringInner_{0.f};
     float ringOuter_{0.f};
     Color ringColor_{};
+    Texture2D ringTexture_{};
     std::vector<Vector3> orbitAu_; // точки орбиты в а.е.
 };
 

@@ -1,4 +1,5 @@
 #include "CelestialBody.hpp"
+#include "SphereMapping.hpp"
 
 #include "rlgl.h"
 
@@ -18,7 +19,13 @@ CelestialBody::CelestialBody(std::string name, BodyId id, float radius,
       color_(color) {
     // Сфера-заглушка с цветом тела. Если позже загрузить текстуру, она ляжет
     // поверх (fallback на цветную сферу — требование проекта).
-    Mesh mesh = GenMeshSphere(radius_, 24, 24);
+    Mesh mesh = GenMeshSphere(radius_, 32, 64);
+    for (int i = 0; i < mesh.vertexCount; ++i)
+        orientSphereSurface(mesh.vertices + i * 3, mesh.normals + i * 3,
+                            mesh.texcoords + i * 2);
+    UpdateMeshBuffer(mesh, 0, mesh.vertices, mesh.vertexCount * 3 * sizeof(float), 0);
+    UpdateMeshBuffer(mesh, 1, mesh.texcoords, mesh.vertexCount * 2 * sizeof(float), 0);
+    UpdateMeshBuffer(mesh, 2, mesh.normals, mesh.vertexCount * 3 * sizeof(float), 0);
     model_ = LoadModelFromMesh(mesh);
     model_.materials[0].maps[MATERIAL_MAP_DIFFUSE].color = color_;
 }
@@ -33,7 +40,16 @@ CelestialBody::~CelestialBody() {
 void CelestialBody::loadTexture(const char* path) {
     if (path == nullptr || !FileExists(path))
         return; // остаётся цветная сфера
-    texture_ = LoadTexture(path);
+    Texture2D loaded = LoadTexture(path);
+    if (!IsTextureValid(loaded))
+        return;
+    if (hasTexture_)
+        UnloadTexture(texture_);
+    texture_ = loaded;
+    GenTextureMipmaps(&texture_);
+    SetTextureFilter(texture_, TEXTURE_FILTER_TRILINEAR);
+    // Clamp at the latitude edges so the south pole never samples the north pole.
+    SetTextureWrap(texture_, TEXTURE_WRAP_CLAMP);
     hasTexture_ = true;
     model_.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture_;
     // С текстурой цвет-модулятор делаем белым, чтобы не искажать цвета.

@@ -1,4 +1,5 @@
 #include "Moon.hpp"
+#include "AssetPath.hpp"
 
 namespace solar {
 
@@ -11,7 +12,9 @@ Moon::Moon(std::string name, BodyId parentId, const CelestialBody& parent,
     : CelestialBody(std::move(name), parentId, radius, /*axialTilt*/ 6.68f,
                     kSiderealMonthHours, color),
       parent_(parent),
-      distanceExaggeration_(distanceExaggeration) {}
+      distanceExaggeration_(distanceExaggeration) {
+    loadTexture(assetPath("textures/moon.jpg").c_str());
+}
 
 void Moon::update(double jd, const IEphemeris& ephemeris) {
     // Реальное геоцентрическое направление от провайдера (а.е.), раздутое

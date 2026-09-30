@@ -7,9 +7,9 @@ Explore planetary motion, switch orbital models, and inspect celestial bodies in
 
 **[Run the interactive browser demo](https://zbybko.github.io/solar-system/)**
 
-![Solar System running in English: Saturn, orbital controls and body information](docs/preview-en.png)
+![Solar System running in English: textured Earth, orbital controls and body information](docs/preview-en.png)
 
-*Actual application capture using the built-in Kepler provider and colored model surfaces.*
+*Actual application capture using the built-in Kepler provider and Solar System Scope surface maps.*
 
 ## Overview
 
@@ -27,6 +27,7 @@ completed milestones and remaining finalization tasks.
 - Simulation pause, adjustable time speed, orbit paths and a reference grid.
 - Compact and real-distance views; body sizes remain exaggerated for readability.
 - Sun lighting, a starfield and an information panel with coordinates and rotation parameters.
+- Bundled Sun, planet and Moon textures with Y-up poles and equirectangular UV mapping.
 - Live **English / Deutsch / Русский** switching in the control panel.
 - Two interchangeable ephemeris providers: built-in Kepler/JPL calculations and optional libnova.
 
@@ -114,18 +115,21 @@ cmake --build out/tests
 ctest --test-dir out/tests --output-on-failure
 ```
 
-The test verifies nonempty translations in all three languages, stable widget IDs and language fallback.
+The tests verify translations, stable widget IDs, language fallback and surface mapping
+(latitude, longitude, pole orientation and lighting normals).
 CI runs these checks; it does not replace graphical or numerical validation.
 
 ## Limitations
 
 - The built-in Moon model uses a simplified circular orbit. Planet positions are approximations.
 - Compact mode, model radii and the Moon's displayed distance are intentionally exaggerated.
-- The repository currently uses colored body surfaces; optional texture loading exists, but planet textures are not bundled.
+- Surface maps are static reference images; seasonal changes, clouds and atmospheric scattering are not simulated.
 - An earlier version reported a transparent-window issue with GLFW/OpenGL on macOS 26. Window presentation can depend on the OS and graphics stack.
 - No ROS integration, robot control or N-body gravitational solver is implemented.
 
 ## Assets and dependencies
 
 DejaVu Sans is bundled for multilingual text; see the [DejaVu Fonts license](https://dejavu-fonts.github.io/License.html).
+Planet, Sun, Moon and ring textures are by Solar System Scope / INOVE under CC BY 4.0;
+see [surface map credits](assets/textures/README.md).
 raylib, Dear ImGui, rlImGui and optional libnova retain their respective licenses.

@@ -1,4 +1,5 @@
 #include "Planet.hpp"
+#include "AssetPath.hpp"
 
 #include "rlgl.h"
 
@@ -11,10 +12,11 @@ namespace {
 // Плоское кольцо-аннулюс в локальной плоскости x-z (y=0). Рисуется в
 // immediate-режиме rlgl — никаких отдельных GPU-ресурсов держать не нужно.
 // Треугольники выводятся в обе стороны, чтобы кольцо было видно сверху и снизу.
-void drawRing(float inner, float outer, Color c) {
+void drawRing(float inner, float outer, Color c, Texture2D texture) {
     constexpr int segments = 72;
     constexpr double kTwoPi = 2.0 * 3.14159265358979323846;
 
+    rlSetTexture(texture.id);
     rlBegin(RL_TRIANGLES);
     rlColor4ub(c.r, c.g, c.b, c.a);
     for (int i = 0; i < segments; ++i) {
@@ -28,14 +30,18 @@ void drawRing(float inner, float outer, Color c) {
         const Vector3 iv1{c1 * inner, 0.f, s1 * inner};
         const Vector3 ov1{c1 * outer, 0.f, s1 * outer};
 
-        // Лицевая сторона.
-        rlVertex3f(iv0.x, iv0.y, iv0.z); rlVertex3f(ov0.x, ov0.y, ov0.z); rlVertex3f(ov1.x, ov1.y, ov1.z);
-        rlVertex3f(iv0.x, iv0.y, iv0.z); rlVertex3f(ov1.x, ov1.y, ov1.z); rlVertex3f(iv1.x, iv1.y, iv1.z);
-        // Обратная сторона (обратный обход).
-        rlVertex3f(iv0.x, iv0.y, iv0.z); rlVertex3f(ov1.x, ov1.y, ov1.z); rlVertex3f(ov0.x, ov0.y, ov0.z);
-        rlVertex3f(iv0.x, iv0.y, iv0.z); rlVertex3f(iv1.x, iv1.y, iv1.z); rlVertex3f(ov1.x, ov1.y, ov1.z);
+        auto vertex = [](Vector3 p, float radialUv) {
+            rlTexCoord2f(radialUv, 0.5f);
+            rlVertex3f(p.x, p.y, p.z);
+        };
+        // The ring map runs from inner radius (left) to outer radius (right).
+        vertex(iv0, 0.f); vertex(ov0, 1.f); vertex(ov1, 1.f);
+        vertex(iv0, 0.f); vertex(ov1, 1.f); vertex(iv1, 0.f);
+        vertex(iv0, 0.f); vertex(ov1, 1.f); vertex(ov0, 1.f);
+        vertex(iv0, 0.f); vertex(iv1, 0.f); vertex(ov1, 1.f);
     }
     rlEnd();
+    rlSetTexture(0);
 }
 
 } // namespace
@@ -44,13 +50,40 @@ Planet::Planet(std::string name, BodyId id, float radius, float axialTiltDeg,
                float rotationPeriodHours, double orbitalPeriodDays, Color color)
     : CelestialBody(std::move(name), id, radius, axialTiltDeg,
                     rotationPeriodHours, color),
-      orbitalPeriodDays_(orbitalPeriodDays) {}
+      orbitalPeriodDays_(orbitalPeriodDays) {
+    const char* texture = nullptr;
+    switch (id) {
+        case BodyId::Mercury: texture = "textures/mercury.jpg"; break;
+        case BodyId::Venus: texture = "textures/venus_atmosphere.jpg"; break;
+        case BodyId::Earth: texture = "textures/earth_daymap.jpg"; break;
+        case BodyId::Mars: texture = "textures/mars.jpg"; break;
+        case BodyId::Jupiter: texture = "textures/jupiter.jpg"; break;
+        case BodyId::Saturn: texture = "textures/saturn.jpg"; break;
+        case BodyId::Uranus: texture = "textures/uranus.jpg"; break;
+        case BodyId::Neptune: texture = "textures/neptune.jpg"; break;
+        case BodyId::Sun: break;
+    }
+    if (texture)
+        loadTexture(assetPath(texture).c_str());
+}
+
+Planet::~Planet() {
+    if (IsTextureValid(ringTexture_))
+        UnloadTexture(ringTexture_);
+}
 
 void Planet::enableRings(float innerRadius, float outerRadius, Color color) {
     hasRings_ = true;
     ringInner_ = innerRadius;
     ringOuter_ = outerRadius;
     ringColor_ = color;
+    if (IsTextureValid(ringTexture_))
+        UnloadTexture(ringTexture_);
+    ringTexture_ = LoadTexture(assetPath("textures/saturn_ring.png").c_str());
+    if (IsTextureValid(ringTexture_)) {
+        SetTextureFilter(ringTexture_, TEXTURE_FILTER_BILINEAR);
+        SetTextureWrap(ringTexture_, TEXTURE_WRAP_CLAMP);
+    }
 }
 
 void Planet::rebuildOrbit(const IEphemeris& ephemeris) {
@@ -99,7 +132,8 @@ void Planet::draw(const RenderContext& ctx) const {
         rlPushMatrix();
         rlTranslatef(p.x, p.y, p.z);
         rlRotatef(axialTilt_, 0.f, 0.f, 1.f); // кольцо в экваториальной плоскости
-        drawRing(ringInner_ * ctx.radiusScale, ringOuter_ * ctx.radiusScale, ringColor_);
+        drawRing(ringInner_ * ctx.radiusScale, ringOuter_ * ctx.radiusScale,
+                 IsTextureValid(ringTexture_) ? WHITE : ringColor_, ringTexture_);
         rlPopMatrix();
     }
 }
