@@ -19,6 +19,9 @@ mit WebGL und Maus. Jeder Push auf `main` aktualisiert die Demo automatisch übe
 - Einstellbare Simulationsgeschwindigkeit, Pause, Umlaufbahnen und Raster.
 - Kompakte Darstellung mit vergrößerten Körpern oder reale Abstände und Körpergrößen in einem gemeinsamen Maßstab.
 - Himmelskörper-Auswahl mit automatischer Kamerafokussierung und optionalem Auswahlgitter (standardmäßig aus).
+- Dunkle Atlas-Oberfläche mit kompakter Navigation, Infokarten, Zeitleiste und ausklappbaren Einstellungen.
+- Langsame Wiedergabe als Standard und logarithmische Geschwindigkeitsregelung.
+- Gefilterte Saturnringe mit Mipmaps und einer feineren Kontur; Kantenglättung, soweit vom Grafiksystem unterstützt.
 - Beleuchtung durch die Sonne, Sternenhintergrund und Informationen zum gewählten Körper.
 - Oberflächentexturen für Sonne, Planeten und Mond mit korrigierter Polausrichtung.
 - Sprachwechsel zwischen **Deutsch, Englisch und Russisch**, ohne Neustart.
@@ -40,7 +43,10 @@ ROS und Robotersteuerung sind nicht Bestandteil des Projekts.
 
 ## Sprache auswählen
 
-Im Steuerungsfenster unter **Language** den Eintrag **Deutsch** auswählen.
+Im Sprachmenü der oberen Leiste **Deutsch** auswählen. Daneben lässt sich ein Planet auswählen.
+**Einstellungen** enthält Umlaufbahnen, Raster, Auswahlgitter, Beleuchtung und Kameramodus.
+Berechnungsmodell, FPS und Julianisches Datum stehen unter **Entwicklerdetails**.
+Die Wiedergabesteuerung bleibt am unteren Rand sichtbar.
 Die Auswahl gilt für die laufende Sitzung. Alternativ vor dem Start `SS_LANGUAGE=de` setzen.
 Englisch ist die Standardsprache; Russisch bleibt verfügbar.
 

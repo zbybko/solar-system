@@ -49,6 +49,7 @@ int main() {
 
     const char* languageEnv = std::getenv("SS_LANGUAGE");
     const auto language = solar::languageFromCode(languageEnv ? languageEnv : "en");
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(screenWidth, screenHeight, solar::text(solar::Text::AppTitle, language));
     SetTargetFPS(60);
 
@@ -56,6 +57,7 @@ int main() {
     rlImGuiBeginInitImGui();
     {
         ImGuiIO& io = ImGui::GetIO();
+        io.IniFilename = nullptr; // Fixed responsive layout, not legacy saved window positions.
         io.Fonts->Clear();
         const std::string fontPath = solar::assetPath("fonts/DejaVuSans.ttf");
         io.Fonts->AddFontFromFileTTF(fontPath.c_str(), 18.0f, nullptr,
@@ -70,7 +72,7 @@ int main() {
     solar::SolarSystem system =
         solar::SolarSystem::createRealistic(makeProvider(0));
 
-    solar::SimulationClock clock{5.0};
+    solar::SimulationClock clock{0.015};
     solar::RenderContext rctx{};
 
     solar::Renderer renderer;

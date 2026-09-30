@@ -30,6 +30,9 @@ public:
         return scaleMode_ == 0 ? RenderContext::Scale::Compact
                                : RenderContext::Scale::Real;
     }
+    void setScale(RenderContext::Scale value) {
+        scaleMode_ = value == RenderContext::Scale::Compact ? 0 : 1;
+    }
     bool showOrbits() const { return showOrbits_; }
     bool showGrid() const { return showGrid_; }
     bool showSelectionWireframe() const { return showSelectionWireframe_; }
@@ -47,6 +50,7 @@ private:
     bool showSelectionWireframe_{false};
     float ambient_{0.12f};
     int provider_{0};
+    bool settingsOpen_{false};
 };
 
 } // namespace solar

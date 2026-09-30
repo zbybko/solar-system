@@ -27,6 +27,9 @@ completed milestones and remaining finalization tasks.
 - Simulation pause, adjustable time speed, orbit paths and a reference grid.
 - Compact view with exaggerated bodies, or real distances **and physical body sizes** using one consistent AU scale.
 - Body selector with automatic camera focus, and an optional selection wireframe (off by default).
+- Restrained dark atlas interface: top navigation, compact body cards, bottom playback controls and expandable settings/developer details.
+- Smooth slow playback by default; logarithmic speed control for both close-up exploration and fast orbital motion.
+- Mipmapped, anisotropically filtered Saturn rings with a 256-segment outline; 4x MSAA requested where the graphics backend supports it.
 - Sun lighting, a starfield and an information panel with coordinates and rotation parameters.
 - Bundled Sun, planet and Moon textures with Y-up poles and equirectangular UV mapping.
 - Live **English / Deutsch / Русский** switching in the control panel.
@@ -73,7 +76,10 @@ The [GitHub Pages demo](https://zbybko.github.io/solar-system/) runs the C++ app
 in your browser through WebAssembly, using the Kepler provider. A desktop browser
 with WebGL and a mouse is recommended.
 
-English is the default. Use **Language** in the control panel to switch without restarting.
+English is the default. Use the language dropdown in the top bar to switch without restarting.
+Choose a body next to it; **Settings** contains orbits, grid, selection wireframe, lighting,
+camera mode and navigation help. Ephemeris selection, FPS and Julian date are under **Developer details**.
+Playback controls stay in the bottom bar. The initial speed is 0.015 simulated days per second.
 The selection lasts for the current session. Set `SS_LANGUAGE=en`, `de` or `ru` to choose a startup language.
 
 | Input | Action |
@@ -123,7 +129,7 @@ CI runs these checks; it does not replace graphical or numerical validation.
 ## Limitations
 
 - The built-in Moon model uses a simplified circular orbit. Planet positions are approximations.
-- Only compact mode exaggerates body radii and the Moon's displayed distance. In real-distance mode, bodies are tiny at system-wide zoom; use **Select body** to inspect them. Both modes represent bodies as spheres, not oblate ellipsoids; ring proportions remain approximate.
+- Only compact mode exaggerates body radii and the Moon's displayed distance. In real-distance mode, bodies are tiny at system-wide zoom; use the top-bar body selector to inspect them. Both modes represent bodies as spheres, not oblate ellipsoids; ring proportions remain approximate.
 - Surface maps are static reference images; seasonal changes, clouds and atmospheric scattering are not simulated.
 - An earlier version reported a transparent-window issue with GLFW/OpenGL on macOS 26. Window presentation can depend on the OS and graphics stack.
 - No ROS integration, robot control or N-body gravitational solver is implemented.

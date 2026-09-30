@@ -13,7 +13,7 @@ namespace {
 // immediate-режиме rlgl — никаких отдельных GPU-ресурсов держать не нужно.
 // Треугольники выводятся в обе стороны, чтобы кольцо было видно сверху и снизу.
 void drawRing(float inner, float outer, Color c, Texture2D texture) {
-    constexpr int segments = 72;
+    constexpr int segments = 256;
     constexpr double kTwoPi = 2.0 * 3.14159265358979323846;
 
     rlSetTexture(texture.id);
@@ -81,7 +81,10 @@ void Planet::enableRings(float innerRadius, float outerRadius, Color color) {
         UnloadTexture(ringTexture_);
     ringTexture_ = LoadTexture(assetPath("textures/saturn_ring.png").c_str());
     if (IsTextureValid(ringTexture_)) {
-        SetTextureFilter(ringTexture_, TEXTURE_FILTER_BILINEAR);
+        // Fine radial bands need mipmaps to avoid shimmering at oblique angles.
+        GenTextureMipmaps(&ringTexture_);
+        SetTextureFilter(ringTexture_, TEXTURE_FILTER_TRILINEAR);
+        SetTextureFilter(ringTexture_, TEXTURE_FILTER_ANISOTROPIC_8X);
         SetTextureWrap(ringTexture_, TEXTURE_WRAP_CLAMP);
     }
 }
